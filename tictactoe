@@ -1,0 +1,108 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class tictactoe extends JFrame implements ActionListener {
+    private static final int BOARD_SIZE = 3;
+    private JButton[][] buttons = new JButton[BOARD_SIZE][BOARD_SIZE];
+    private boolean playerXTurn = true;
+
+    public tictactoe() {
+        setTitle("Tic Tac Toe");
+        setSize(300, 300);
+        setLayout(new GridLayout(BOARD_SIZE, BOARD_SIZE));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                buttons[row][col] = new JButton("");
+                buttons[row][col].setFont(new Font("Arial", Font.PLAIN, 60));
+                buttons[row][col].setFocusPainted(false);
+                buttons[row][col].addActionListener(this);
+                add(buttons[row][col]);
+            }
+        }
+
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JButton clickedButton = (JButton) e.getSource();
+
+        if (!clickedButton.getText().equals("")) {
+            return; // Do nothing if the button is already clicked
+        }
+
+        if (playerXTurn) {
+            clickedButton.setText("X");
+        } else {
+            clickedButton.setText("O");
+        }
+
+        playerXTurn = !playerXTurn;
+
+        if (checkForWinner()) {
+            JOptionPane.showMessageDialog(this, "We have a winner!");
+            resetBoard();
+        } else if (isBoardFull()) {
+            JOptionPane.showMessageDialog(this, "It's a draw!");
+            resetBoard();
+        }
+    }
+
+    private boolean checkForWinner() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (checkRow(i) || checkColumn(i)) {
+                return true;
+            }
+        }
+        return checkDiagonals();
+    }
+
+    private boolean checkRow(int row) {
+        return buttons[row][0].getText().equals(buttons[row][1].getText()) &&
+               buttons[row][1].getText().equals(buttons[row][2].getText()) &&
+               !buttons[row][0].getText().equals("");
+    }
+
+    private boolean checkColumn(int col) {
+        return buttons[0][col].getText().equals(buttons[1][col].getText()) &&
+               buttons[1][col].getText().equals(buttons[2][col].getText()) &&
+               !buttons[0][col].getText().equals("");
+    }
+
+    private boolean checkDiagonals() {
+        return (buttons[0][0].getText().equals(buttons[1][1].getText()) &&
+                buttons[1][1].getText().equals(buttons[2][2].getText()) &&
+                !buttons[0][0].getText().equals("")) ||
+               (buttons[0][2].getText().equals(buttons[1][1].getText()) &&
+                buttons[1][1].getText().equals(buttons[2][0].getText()) &&
+                !buttons[0][2].getText().equals(""));
+    }
+
+    private boolean isBoardFull() {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                if (buttons[row][col].getText().equals("")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void resetBoard() {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                buttons[row][col].setText("");
+            }
+        }
+        playerXTurn = true;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new tictactoe());
+    }
+}
